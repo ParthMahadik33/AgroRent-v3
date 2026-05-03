@@ -9,3 +9,4 @@ python-dotenv==1.0.0
 twilio==9.3.0
 redis==5.0.0
 razorpay==1.4.1
+setuptools

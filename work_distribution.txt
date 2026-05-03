@@ -1,0 +1,21 @@
+AgroRent - Team Work Distribution
+==================================
+
+1. Parth Mahadik (Team Lead)
+   - Core Development (Backend & Frontend)
+   - Groq & Gemini AI Integration
+   - Database Design and Management
+   - Deployment Strategy (Render & ngrok)
+   - Project Architecture
+
+2. Shreya Raut
+   - Twilio API Integration
+   - WhatsApp Bot Development
+   - Messaging Workflow Management
+   - Sandbox Configuration & Testing
+
+3. Vinee Sawant
+   - Business Logic and Pricing Models
+   - UI/UX Design and Implementation
+   - Project Documentation (README & PRD)
+   - User Journey Mapping
