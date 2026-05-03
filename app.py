@@ -5,6 +5,8 @@ from flask_cors import CORS
 from config import SECRET_KEY
 from database import add_default_listings, init_db
 from routes import register_blueprints
+from routes.payments import payments_bp
+from seed import seed_demo_data
 from utils.translations import inject_translation_helpers, select_locale
 
 
@@ -42,10 +44,12 @@ def create_app():
     app.context_processor(inject_translation_helpers)
 
     register_blueprints(app)
+    app.register_blueprint(payments_bp)
     _register_legacy_endpoint_aliases(app)
 
     with app.app_context():
         init_db()
+        seed_demo_data()
         add_default_listings()
 
     return app

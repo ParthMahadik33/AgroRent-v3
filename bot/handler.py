@@ -1,11 +1,26 @@
+from datetime import datetime, timedelta
+
 from bot.nlu import extract_intent, translate_to_language, get_crop_equipment
 from database import get_db
+from routes.payments import _parse_sqlite_datetime, initiate_refund_for_rental
 
 # Store last search results per user (simple in-memory)
 user_sessions = {}
 
+
+def _phone_tail(raw):
+    d = ''.join(c for c in str(raw) if c.isdigit())
+    return d[-10:] if len(d) >= 10 else d
+
+
 def handle_whatsapp_message(from_number, body, media_url=None):
     """Main bot handler with Gemini NLU"""
+
+    raw = (body or '').strip()
+    if raw.upper().startswith('CANCEL '):
+        parts = raw.split()
+        if len(parts) == 2 and parts[1].isdigit():
+            return handle_owner_cancel(from_number, int(parts[1]))
 
     # Get user session
     session = user_sessions.get(from_number, {})
@@ -152,6 +167,82 @@ def build_listing_detail(item, number):
         f"🔗 Book online: agrorent-r3i4.onrender.com\n\n"
         f"Type *help* to search more equipment."
     )
+
+
+def handle_owner_cancel(from_number, rental_id):
+    """Handle owner cancellation via WhatsApp (within 2 hours; refund if paid)."""
+    conn = None
+    try:
+        conn = get_db()
+        rental = conn.execute(
+            '''
+            SELECT r.*, l.title, l.phone AS owner_phone,
+                   l.owner_name, u.name AS farmer_name, u.phone AS farmer_phone
+            FROM rentals r
+            JOIN listings l ON r.listing_id = l.id
+            JOIN users u ON r.user_id = u.id
+            WHERE r.id = ?
+            ''',
+            (rental_id,),
+        ).fetchone()
+
+        if not rental:
+            conn.close()
+            return '❌ Booking not found.'
+
+        from_clean = from_number.replace('whatsapp:', '').strip()
+        owner_tail = _phone_tail(rental['owner_phone'])
+        caller_tail = _phone_tail(from_clean)
+        if owner_tail != caller_tail:
+            conn.close()
+            return '❌ You are not authorized to cancel this booking.'
+
+        created_at = _parse_sqlite_datetime(rental['created_at'])
+        if datetime.now() - created_at > timedelta(hours=2):
+            conn.close()
+            return (
+                '❌ Cancellation window expired.\n'
+                'Bookings can only be cancelled within 2 hours.\n'
+                'Please contact support.'
+            )
+
+        if rental['payment_id']:
+            try:
+                initiate_refund_for_rental(rental)
+            except Exception as refund_err:
+                print(f'WhatsApp cancel refund error: {refund_err}')
+                return 'Refund could not be processed. Please try the website or contact support.'
+
+        conn.execute(
+            'UPDATE rentals SET status = ? WHERE id = ?',
+            ('Cancelled', rental_id),
+        )
+        conn.commit()
+        conn.close()
+        conn = None
+
+        from bot.notifications import notify_farmer_cancelled
+
+        try:
+            notify_farmer_cancelled(dict(rental))
+        except Exception as notify_err:
+            print(f'Farmer notify error: {notify_err}')
+
+        return (
+            f'✅ Booking #{rental_id} cancelled.\n'
+            f'Farmer {rental["farmer_name"]} has been notified.\n'
+            f'Refund of ₹{rental["total_amount"]} initiated.'
+        )
+
+    except Exception as e:
+        print(f'Cancel error: {e}')
+        if conn:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            conn.close()
+        return 'Something went wrong. Please try again.'
 
 
 def get_my_bookings(from_number):

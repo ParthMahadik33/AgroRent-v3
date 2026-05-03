@@ -9,6 +9,71 @@ document.addEventListener('DOMContentLoaded', function () {
     let allListings = [];
     let currentListing = null;
 
+    window.showSuccessMessage = function (message) {
+        alert(message);
+    };
+
+    window.initiatePayment = async function (rentalId, totalAmount, equipmentTitle) {
+        try {
+            const orderRes = await fetch('/create_order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ rental_id: rentalId, amount: totalAmount }),
+            });
+            const orderData = await orderRes.json();
+
+            if (!orderData.success) {
+                alert(orderData.error || 'Payment initialization failed. Please try again.');
+                return;
+            }
+
+            const options = {
+                key: orderData.key,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: 'AgroRent',
+                description: `Rental: ${equipmentTitle}`,
+                image: '/static/images/logo.png',
+                order_id: orderData.order_id,
+                handler: async function (response) {
+                    const verifyRes = await fetch('/payment_success', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            rental_id: rentalId,
+                        }),
+                    });
+                    const verifyData = await verifyRes.json();
+
+                    if (verifyData.success) {
+                        const rentalModal = document.getElementById('rental-modal');
+                        if (rentalModal) rentalModal.classList.remove('show');
+                        window.showSuccessMessage('✅ Payment successful! Your booking is confirmed.');
+                        setTimeout(() => { window.location.href = '/rentdashboard'; }, 2000);
+                    } else {
+                        alert(verifyData.error || 'Payment verification failed. Contact support.');
+                    }
+                },
+                prefill: {
+                    name: (document.querySelector('.username') && document.querySelector('.username').textContent.trim()) || '',
+                    contact: '',
+                },
+                theme: { color: '#1B6B2F' },
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        } catch (err) {
+            console.error('Payment init error:', err);
+            alert('Payment initialization failed. Please try again.');
+        }
+    };
+
     // Initialize
     loadListings();
     initEventListeners();
@@ -873,44 +938,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (data.success) {
-                // Close agreement modal
                 closeAgreementModal();
 
-                // Show success message with contract download option
-                if (confirm('Rental request submitted successfully! The owner will review and approve your request.\n\nWould you like to download a draft copy of the agreement?')) {
-                    // Generate and download contract (use POST method)
-                    try {
-                        const contractResponse = await fetch(`/api/rentals/${data.rental_id}/generate-contract`, {
-                            method: 'POST'
-                        });
+                const title = (currentListing && currentListing.title) ? currentListing.title : 'Equipment';
+                await window.initiatePayment(data.rental_id, data.total_amount, title);
 
-                        if (contractResponse.ok) {
-                            const blob = await contractResponse.blob();
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `Rental_Agreement_${data.rental_id}.pdf`;
-                            document.body.appendChild(a);
-                            a.click();
-                            window.URL.revokeObjectURL(url);
-                            document.body.removeChild(a);
-                        } else {
-                            const errorData = await contractResponse.json().catch(() => ({ message: 'Failed to download contract' }));
-                            alert('Error downloading contract: ' + (errorData.message || 'Unknown error'));
-                        }
-                    } catch (error) {
-                        console.error('Error downloading contract:', error);
-                        alert('An error occurred while downloading the contract.');
-                    }
-                }
-
-                // Reset selection
                 selectedStartDate = null;
                 selectedEndDate = null;
-                // Close details modal
                 document.getElementById('details-modal').classList.remove('show');
                 document.body.style.overflow = 'visible';
-                // Reload listings
                 if (typeof loadListings === 'function') {
                     loadListings();
                 }
@@ -960,14 +996,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (data.success) {
-                alert('Rental request submitted successfully! The owner will review and approve your request.');
-                // Reset selection
+                const title = (currentListing && currentListing.title) ? currentListing.title : 'Equipment';
+                await window.initiatePayment(data.rental_id, data.total_amount, title);
                 selectedStartDate = null;
                 selectedEndDate = null;
-                // Close modal
                 document.getElementById('details-modal').classList.remove('show');
                 document.body.style.overflow = 'visible';
-                // Reload listings
                 if (typeof loadListings === 'function') {
                     loadListings();
                 }
@@ -1253,10 +1287,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (data.success) {
-                alert('Rental request submitted successfully! The owner will review and approve your request.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                const title = (currentListing && currentListing.title) ? currentListing.title : 'Equipment';
+                await window.initiatePayment(data.rental_id, data.total_amount, title);
                 document.getElementById('rental-modal').classList.remove('show');
                 document.body.style.overflow = 'visible';
-                // Reload listings to update calendar
                 if (typeof loadListings === 'function') {
                     loadListings();
                 }

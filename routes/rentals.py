@@ -221,8 +221,9 @@ def rent_equipment():
         
         return jsonify({
             'success': True,
-            'message': 'Rental request submitted successfully! The owner will review and approve your request.',
-            'rental_id': rental_id
+            'rental_id': rental_id,
+            'total_amount': total_amount,
+            'message': 'Booking created, proceed to payment',
         }), 200
     except Exception as e:
         # Rollback transaction on any error

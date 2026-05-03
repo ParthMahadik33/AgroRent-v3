@@ -78,6 +78,7 @@ def init_db():
             renter_address TEXT,
             location_of_use TEXT,
             contract_path TEXT,
+            payment_id TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id),
             FOREIGN KEY (listing_id) REFERENCES listings(id)
@@ -94,6 +95,8 @@ def init_db():
             conn.execute('ALTER TABLE rentals ADD COLUMN location_of_use TEXT')
         if 'contract_path' not in columns:
             conn.execute('ALTER TABLE rentals ADD COLUMN contract_path TEXT')
+        if 'payment_id' not in columns:
+            conn.execute('ALTER TABLE rentals ADD COLUMN payment_id TEXT')
     except sqlite3.OperationalError:
         pass
 
