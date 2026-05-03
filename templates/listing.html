@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Listing - AgroRent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/listing.css') }}">
+</head>
+<body data-listing-is-editing="{% if editing_data is defined and editing_data %}true{% else %}false{% endif %}" data-listing-editing='{% if editing_data is defined and editing_data %}{{ editing_data|tojson }}{% else %}null{% endif %}'>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('index') }}">
+                    <span class="logo-icon">🌾</span>
+                    AgroRent
+                </a>
+            </div>
+            <div class="nav-right">
+                {% if session.user_id %}
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profile-btn">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="username">{{ session.user_name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="{{ url_for('rentdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-tractor"></i>
+                            <span>Renting Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('listdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-list"></i>
+                            <span>Listing Dashboard</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('signout') }}" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="auth-buttons">
+                    <a href="{{ url_for('signin') }}" class="nav-btn login-btn">Sign In</a>
+                    <a href="{{ url_for('signup') }}" class="nav-btn signup-btn">Sign Up</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="listing-container">
+        <div class="listing-header">
+            {% if editing_data %}
+            <h1><i class="fas fa-edit"></i> Edit Equipment Listing</h1>
+            <p>Update your equipment listing details</p>
+            {% else %}
+            <h1><i class="fas fa-plus-circle"></i> Create Equipment Listing</h1>
+            <p>Fill in the details to list your equipment for rent</p>
+            {% endif %}
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="step-indicators">
+                <div class="step-indicator active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Owner</div>
+                </div>
+                <div class="step-indicator" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Equipment</div>
+                </div>
+                <div class="step-indicator" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Location</div>
+                </div>
+                <div class="step-indicator" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Pricing</div>
+                </div>
+                <div class="step-indicator" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Description</div>
+                </div>
+                <div class="step-indicator" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-label">Photos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span>{{ message }}</span>
+                            <button class="close-alert" onclick="this.parentElement.remove()">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Form Container -->
+        <form class="listing-form" id="listing-form" method="POST" action="{{ url_for('create_listing') }}" enctype="multipart/form-data">
+            {% if editing_id %}
+            <input type="hidden" id="editing_id" name="editing_id" value="{{ editing_id }}">
+            {% endif %}
+            <!-- Step 1: Owner & Contact -->
+            <div class="form-step active" id="step-1">
+                <div class="step-header">
+                    <h2><i class="fas fa-user"></i> Owner & Contact Information</h2>
+                    <p>Tell us how to reach you</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="owner_name">Owner Name <span class="required">*</span></label>
+                        <input type="text" id="owner_name" name="owner_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="+91 9876543210" required>
+                        <small class="form-hint">WhatsApp preferred</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email (Optional)</label>
+                        <input type="email" id="email" name="email" placeholder="owner@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_method">Preferred Contact Method <span class="required">*</span></label>
+                        <select id="contact_method" name="contact_method" required>
+                            <option value="">Select method</option>
+                            <option value="Call">Call</option>
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="SMS">SMS</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Equipment Details -->
+            <div class="form-step" id="step-2">
+                <div class="step-header">
+                    <h2><i class="fas fa-tractor"></i> Equipment Details</h2>
+                    <p>Describe your equipment</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="category">Equipment Category <span class="required">*</span></label>
+                        <select id="category" name="category" required>
+                            <option value="">Select category</option>
+                            <option value="Tractor">Tractor</option>
+                            <option value="Harvester">Harvester</option>
+                            <option value="Sprayer">Sprayer</option>
+                            <option value="Tiller">Tiller</option>
+                            <option value="Seed Drill">Seed Drill</option>
+                            <option value="Pump">Pump</option>
+                            <option value="Cultivator">Cultivator</option>
+                            <option value="Rotavator">Rotavator</option>
+                            <option value="Thresher">Thresher</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment_name">Equipment Name / Model <span class="required">*</span></label>
+                        <input type="text" id="equipment_name" name="equipment_name" placeholder="e.g., Mahindra 575 DI" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">Brand <span class="required">*</span></label>
+                        <input type="text" id="brand" name="brand" placeholder="e.g., Mahindra, John Deere" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year of Purchase</label>
+                        <input type="number" id="year" name="year" placeholder="e.g., 2020" min="1950" max="2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="condition">Condition <span class="required">*</span></label>
+                        <select id="condition" name="condition" required>
+                            <option value="">Select condition</option>
+                            <option value="New">New</option>
+                            <option value="Good">Good</option>
+                            <option value="Needs maintenance">Needs maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="power_spec">Power/Specifications (Optional)</label>
+                        <input type="text" id="power_spec" name="power_spec" placeholder="e.g., 65 HP, 5 HP capacity">
+                        <small class="form-hint">HP for tractor, capacity for pump, etc.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Location -->
+            <div class="form-step" id="step-3">
+                <div class="step-header">
+                    <h2><i class="fas fa-map-marker-alt"></i> Location Details</h2>
+                    <p>Where is your equipment located?</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="state">State <span class="required">*</span></label>
+                        <input type="text" id="state" name="state" placeholder="e.g., Maharashtra" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="district">District <span class="required">*</span></label>
+                        <input type="text" id="district" name="district" placeholder="e.g., Pune" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="village_city">Village / City <span class="required">*</span></label>
+                        <input type="text" id="village_city" name="village_city" placeholder="e.g., Baramati" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode <span class="required">*</span></label>
+                        <input type="text" id="pincode" name="pincode" placeholder="e.g., 413102" pattern="[0-9]{6}" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="landmark">Landmark (Optional)</label>
+                        <input type="text" id="landmark" name="landmark" placeholder="e.g., Near bus stand">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="service_radius">Service Radius <span class="required">*</span></label>
+                        <input type="text" id="service_radius" name="service_radius" placeholder="e.g., within 20 km, only local village" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Pricing & Availability -->
+            <div class="form-step" id="step-4">
+                <div class="step-header">
+                    <h2><i class="fas fa-rupee-sign"></i> Pricing & Availability</h2>
+                    <p>Set your rental rates and availability</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pricing_type">Pricing Type <span class="required">*</span></label>
+                        <select id="pricing_type" name="pricing_type" required>
+                            <option value="">Select type</option>
+                            <option value="Per hour">Per hour</option>
+                            <option value="Per day">Per day</option>
+                            <option value="Per acre">Per acre</option>
+                            <option value="Per season">Per season</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price (₹) <span class="required">*</span></label>
+                        <input type="number" id="price" name="price" placeholder="e.g., 1500" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="min_duration">Minimum Rental Duration (Optional)</label>
+                        <input type="text" id="min_duration" name="min_duration" placeholder="e.g., 1 day, 4 hours">
+                    </div>
+                    <div class="form-group">
+                        <label for="available_from">Available From Date <span class="required">*</span></label>
+                        <input type="date" id="available_from" name="available_from" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="available_till">Available Till Date (Optional)</label>
+                        <input type="date" id="available_till" name="available_till">
+                    </div>
+                    <div class="form-group">
+                        <label for="transport_included">Is Transport Included? <span class="required">*</span></label>
+                        <select id="transport_included" name="transport_included" required>
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="transport-charge-group" style="display: none;">
+                        <label for="transport_charge">Transport Charge (₹) (Optional)</label>
+                        <input type="number" id="transport_charge" name="transport_charge" placeholder="e.g., 500" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Rules & Description -->
+            <div class="form-step" id="step-5">
+                <div class="step-header">
+                    <h2><i class="fas fa-file-alt"></i> Description & Rules</h2>
+                    <p>Add details and terms for renters</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="title">Short Title <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" placeholder="e.g., 65 HP Tractor with Trolley" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="description">Detailed Description <span class="required">*</span></label>
+                        <textarea id="description" name="description" rows="6" placeholder="Describe usage, conditions, what's included..." required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="rules">Rules/Terms (Optional)</label>
+                        <textarea id="rules" name="rules" rows="4" placeholder="e.g., Diesel by renter, Operator must be provided, etc."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Photos -->
+            <div class="form-step" id="step-6">
+                <div class="step-header">
+                    <h2><i class="fas fa-images"></i> Equipment Photos</h2>
+                    <p>Upload 3-5 images of your equipment</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="main_image">Main Image <span class="required">*</span></label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="main_image" name="main_image" accept="image/*" required>
+                            <div class="file-upload-display">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload main image</p>
+                                <small>JPG, PNG (Max 5MB)</small>
+                            </div>
+                            <div class="image-preview" id="main-preview"></div>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="additional_images">Additional Images (Optional)</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="additional_images" name="additional_images" accept="image/*" multiple>
+                            <div class="file-upload-display">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload additional images</p>
+                                <small>You can select multiple images (Max 5MB each)</small>
+                            </div>
+                            <div class="image-preview-grid" id="additional-preview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="form-navigation">
+                <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button type="button" class="btn btn-primary" id="next-btn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;">
+                    <i class="fas fa-check"></i> Submit Listing
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="success-modal" id="success-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="modal-title">{% if editing_data %}Listing Updated Successfully!{% else %}Equipment Listed Successfully!{% endif %}</h2>
+            <p class="modal-message">{% if editing_data %}Your listing has been updated and is now available for rent.{% else %}Your equipment has been listed and is now available for rent.{% endif %}</p>
+            <a href="{{ url_for('listdashboard') }}" class="btn btn-success modal-button">
+                <i class="fas fa-arrow-right"></i> Go to Listing Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/listing.js') }}"></script>
+</body>
+</html>
+

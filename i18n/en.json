@@ -1,0 +1,216 @@
+{
+  "nav": {
+    "brand": "AgroRent",
+    "home": "Home",
+    "browse_equipment": "Browse Equipment",
+    "find_mechanic": "Find Mechanic",
+    "register_mechanic": "Register as Mechanic",
+    "edit_profile": "Edit / Add Profile",
+    "market": "Market Overview",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "about": "About",
+    "language_label": "Language",
+    "rent_dashboard": "Renting Dashboard",
+    "list_dashboard": "Listing Dashboard",
+    "mechanic_dashboard": "Mechanic Dashboard",
+    "heatmap": "Heatmap",
+    "mechanics_menu": "Mechanics",
+    "logout": "Logout"
+  },
+  "language": {
+    "current": "Current language: {language}",
+    "change": "Change language"
+  },
+  "home": {
+    "hero": {
+      "tagline": "Rent Farm Machinery. Grow More, Spend Less.",
+      "subtext": "Discover affordable tools near you.",
+      "cta_primary": "Start Listing",
+      "cta_secondary": "Get Started",
+      "cta_renting": "Start Renting"
+    }
+  },
+  "auth": {
+    "signup": {
+      "missing_fields": "Name, email, and password are required.",
+      "short_password": "Password must be at least 6 characters long.",
+      "invalid_email": "Please enter a valid email address.",
+      "email_exists": "Email already registered. Please sign in instead.",
+      "success": "Account created successfully! Please sign in."
+    },
+    "signin": {
+      "missing_fields": "Please enter both email and password.",
+      "welcome": "Welcome back, {name}!",
+      "invalid_credentials": "Invalid email or password."
+    },
+    "signout": {
+      "success": "You have been signed out successfully."
+    }
+  },
+  "alerts": {
+    "login_required": "Please log in to access this page.",
+    "generic_error": "An error occurred. Please try again.",
+    "language_changed": "Language switched to {language}.",
+    "language_invalid": "That language is not available yet."
+  },
+  "listings": {
+    "edit": {
+      "forbidden": "You do not have permission to edit this listing.",
+      "not_found": "Listing not found or you do not have permission to edit it."
+    }
+  },
+  "mechanic": {
+    "specializations": {
+      "tractor": "Tractor",
+      "harvester": "Harvester",
+      "pump": "Pump",
+      "sprayer": "Sprayer",
+      "tiller": "Tiller",
+      "general farm machinery": "General Farm Machinery"
+    },
+    "register": {
+      "title": "Register as an Agro-Doctor",
+      "subtitle": "List your expertise so farmers nearby can reach you for on-ground repairs.",
+      "fields": {
+        "full_name": "Full Name *",
+        "phone": "Phone / WhatsApp *",
+        "email": "Email (optional)",
+        "experience": "Years of Experience",
+        "specialization": "Primary Specialization *",
+        "locations": "Serviceable Locations *",
+        "base_charge": "Base Visit Charge (₹) *",
+        "description": "About you & tools"
+      },
+      "placeholders": {
+        "full_name": "Eg: Rakesh Verma",
+        "phone": "+91 90000 00000",
+        "email": "you@example.com",
+        "experience": "Eg: 5",
+        "locations": "Village / town, district, state or pin",
+        "base_charge": "Eg: 500",
+        "description": "Share the brands you know, tools carried, languages spoken etc.",
+        "specialization_option": "Select specialization"
+      },
+      "toggle": "Available for calls today",
+      "submit": "Submit & Join Network",
+      "success": "Thanks for joining the Agro-Doctor network! Your profile is live.",
+      "failure": "Unable to save your profile right now. Please try again.",
+      "errors": {
+        "full_name": "Full name is required.",
+        "phone": "Phone or WhatsApp number is required.",
+        "specialization": "Please select a valid specialization.",
+        "locations": "Serviceable locations are required.",
+        "base_charge": "Base visit charge is required.",
+        "base_charge_number": "Base visit charge must be a number.",
+        "experience_number": "Experience must be a whole number."
+      }
+    },
+    "list": {
+      "title": "Mechanic Network",
+      "subtitle": "Search trusted Agro-Doctors for tractors, harvesters, pumps, sprayers and more.",
+      "filters": {
+        "location": "Location / pincode",
+        "specialization": "Specialization",
+        "all": "All",
+        "availability": "Availability",
+        "available_now": "Available now",
+        "submit": "Apply Filters"
+      },
+      "card": {
+        "available": "Available",
+        "unavailable": "Not Available",
+        "experience": "{years} years experience",
+        "service_area": "Service areas: {areas}",
+        "base_visit": "Base visit: ₹{charge}",
+        "no_description": "No bio shared yet."
+      },
+      "buttons": {
+        "view_details": "View Details",
+        "request_service": "Request Service"
+      },
+      "empty": {
+        "title": "No mechanics match these filters yet.",
+        "subtitle": "Try clearing the filters or invite your local Agro-Doctor to sign up.",
+        "cta": "Become an Agro-Doctor"
+      },
+      "details": {
+        "specialization": "Specialization",
+        "experience": "Experience",
+        "experience_missing": "Info not provided",
+        "base_visit": "Base visit",
+        "service_area": "Service areas"
+      },
+      "request": {
+        "title": "Request Service",
+        "mechanic_label": "Talking to: {name}",
+        "fields": {
+          "farmer_name": "Your Name *",
+          "phone": "Phone Number *",
+          "location": "Exact Location *",
+          "issue": "Issue Description *"
+        },
+        "submit": "Send Request",
+        "sending": "Sending request...",
+        "error": "Unable to send request at the moment."
+      }
+    },
+    "requests": {
+      "created": "Service request sent to the mechanic.",
+      "missing_fields": "All fields are required.",
+      "not_found": "Mechanic not found.",
+      "status_updated": "Status updated successfully.",
+      "status_labels": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "completed": "Completed"
+      }
+    },
+    "dashboard": {
+      "title": "Mechanic Dashboard",
+      "subtitle": "Manage your availability and keep track of farmer requests.",
+      "toggle_label": "Available for calls",
+      "visible": "Currently visible on listing",
+      "hidden": "Hidden from listing",
+      "summary_suffix": " · {specialization}{experience}",
+      "experience_suffix": " · {years} yrs exp",
+      "service_area": "Service areas: {areas}",
+      "base_rate": "Base visit charge: ₹{charge}",
+      "availability_updating": "Updating...",
+      "availability_error": "Update failed, please retry.",
+      "no_requests_title": "No requests yet.",
+      "no_requests_body": "Share your AgroRent profile with farmers so they can reach you.",
+      "no_profile_title": "No mechanic profile found.",
+      "no_profile_body": "Link your account by completing the registration form.",
+      "no_profile_cta": "Register now",
+      "list_cta": "View listing",
+      "request": {
+        "farmer": "Farmer: {name}",
+        "phone": "📞 {phone}",
+        "location": "📍 {location}",
+        "issue": "Issue: {issue}",
+        "accept": "Mark as Accepted",
+        "complete": "Mark as Completed",
+        "retry": "Retry {status}"
+      }
+    }
+  },
+  "about": {
+    "hero_title": "About AgroRent",
+    "intro": "AgroRent is a location-based marketplace that connects farming equipment owners directly with small and mid-scale farmers who need to rent machinery. We're building a community that makes agriculture more accessible and sustainable.",
+    "farmers_title": "For Farmers",
+    "farmers_body": "Get access to affordable equipment when you need it most. No large upfront investments—rent high-quality machinery for your specific farming needs.",
+    "owners_title": "For Equipment Owners",
+    "owners_body": "Earn income from idle machinery. Turn your unused equipment into a revenue stream while helping fellow farmers grow their operations.",
+    "reasons_title": "Why Choose AgroRent?",
+    "reason_pricing": "Transparent Pricing",
+    "reason_pricing_body": "Clear, upfront pricing with no hidden fees. Know exactly what you're paying before you book.",
+    "reason_verified": "Verified Listings",
+    "reason_verified_body": "All equipment is verified for quality and safety. Trust that you're renting reliable machinery.",
+    "reason_booking": "Direct Booking",
+    "reason_booking_body": "Connect directly with equipment owners. Simple, fast booking process with instant confirmations.",
+    "illustration_title": "Easy Equipment Comparison",
+    "illustration_body": "Browse, compare, and book equipment right from your phone or laptop. Our intuitive platform makes finding the perfect machinery simple and fast.",
+    "footer": "© 2024 AgroRent. All rights reserved."
+  }
+}

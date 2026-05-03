@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent Equipment - AgroRent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/renting.css') }}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('index') }}">
+                    <span class="logo-icon">🌾</span>
+                    AgroRent
+                </a>
+            </div>
+            <div class="nav-right">
+                {% if session.user_id %}
+                <!-- Notifications -->
+                <div class="notification-dropdown">
+                    <button class="notification-btn" id="notification-btn" onclick="toggleNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                    </button>
+                    <div class="notification-menu" id="notification-menu">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button class="mark-all-read-btn" onclick="markAllNotificationsRead()" id="mark-all-read-btn" style="display: none;">Mark all as read</button>
+                        </div>
+                        <div class="notification-list" id="notification-list">
+                            <div class="notification-loading">Loading notifications...</div>
+                        </div>
+                        <div class="notification-empty" id="notification-empty" style="display: none;">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>No notifications</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profile-btn">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="username">{{ session.user_name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="{{ url_for('rentdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-tractor"></i>
+                            <span>Renting Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('listdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-list"></i>
+                            <span>Listing Dashboard</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('signout') }}" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="auth-buttons">
+                    <a href="{{ url_for('signin') }}" class="nav-btn login-btn">Sign In</a>
+                    <a href="{{ url_for('signup') }}" class="nav-btn signup-btn">Sign Up</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="renting-container">
+        <div class="page-header">
+            <h1><i class="fas fa-tractor"></i> Available Equipment</h1>
+            <p>Browse and rent farm machinery from local owners</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-row">
+                <div class="filter-group search-group">
+                    <label for="search-filter"><i class="fas fa-search"></i> Search listings</label>
+                    <div class="search-input-wrapper">
+                        <input type="text" id="search-filter" placeholder="Try “John Deere”, “sprayer”, “tractor with trailer”…">
+                        <button type="button" class="btn-clear-input" id="clear-search" aria-label="Clear search">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="category-filter"><i class="fas fa-filter"></i> Category</label>
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Tractor">Tractor</option>
+                        <option value="Harvester">Harvester</option>
+                        <option value="Sprayer">Sprayer</option>
+                        <option value="Tiller">Tiller</option>
+                        <option value="Seed Drill">Seed Drill</option>
+                        <option value="Pump">Pump</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="location-filter"><i class="fas fa-map-marker-alt"></i> Location</label>
+                    <input type="text" id="location-filter" placeholder="State, district, or city">
+                </div>
+            </div>
+            <div class="filters-row secondary-row">
+                <div class="filter-group price-group">
+                    <label><i class="fas fa-rupee-sign"></i> Price range</label>
+                    <div class="price-inputs">
+                        <input type="number" id="price-min" placeholder="Min">
+                        <span class="price-separator">to</span>
+                        <input type="number" id="price-max" placeholder="Max">
+                    </div>
+                </div>
+                <div class="filter-group sort-group">
+                    <label for="sort-order"><i class="fas fa-sort"></i> Sort by</label>
+                    <select id="sort-order">
+                        <option value="recommended">Recommended</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="newest">Newest Listings</option>
+                    </select>
+                </div>
+                <div class="filters-actions">
+                    <button class="btn-secondary" id="clear-filters" type="button">
+                        <i class="fas fa-redo-alt"></i> Reset
+                    </button>
+                    <button class="btn-filter" id="apply-filters" type="button">
+                        <i class="fas fa-search"></i> Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading equipment...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <i class="fas fa-inbox"></i>
+            <h3>No equipment found</h3>
+            <p>Try adjusting your filters or check back later</p>
+        </div>
+
+        <!-- Listings Grid -->
+        <div class="listings-grid" id="listings-grid">
+            <!-- Cards will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="details-modal" id="details-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="close-modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-body" id="modal-body">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Rental Modal -->
+    <div class="rental-modal" id="rental-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="close-rental-modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="rental-form-container" id="rental-form-container">
+                <!-- Rental form will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% if session.user_id %}
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/renting.js') }}"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('mechanic.list.title') }} | {{ t('nav.brand') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mechanics.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="simple-nav">
+            <div class="nav-container">
+                <div class="nav-left">
+                    <a href="{{ url_for('index') }}">🌾 {{ t('nav.brand') }}</a>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-switcher" aria-label="{{ t('language.change') }}">
+                        {% for code in supported_languages %}
+                        <a href="{{ url_for('set_language', lang_code=code) }}"
+                           class="language-pill {% if current_locale == code %}active{% endif %}">
+                            {{ language_names[code] }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <a class="nav-link-btn secondary" href="{{ url_for('mechanic_register') }}">{{ t('nav.register_mechanic') }}</a>
+                    {% if session.user_id %}
+                    <a class="nav-link-btn secondary" href="{{ url_for('mechanic_dashboard') }}">{{ t('nav.mechanic_dashboard') }}</a>
+                    <a class="nav-link-btn primary" href="{{ url_for('signout') }}">{{ t('nav.logout') }}</a>
+                    {% else %}
+                    <a class="nav-link-btn secondary" href="{{ url_for('signin') }}">{{ t('nav.sign_in') }}</a>
+                    <a class="nav-link-btn primary" href="{{ url_for('signup') }}">{{ t('nav.sign_up') }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <section class="content-section">
+            <div class="page-header">
+                <h1>{{ t('mechanic.list.title') }}</h1>
+                <p>{{ t('mechanic.list.subtitle') }}</p>
+            </div>
+
+            <div class="card filters-card">
+                <form method="GET" action="{{ url_for('mechanics_list') }}">
+                    <div class="form-group">
+                        <label for="q">{{ t('mechanic.list.filters.location') }}</label>
+                        <input type="text" id="q" name="q" placeholder="Eg: Baramati, 413102" value="{{ filters.search }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="specialization">{{ t('mechanic.list.filters.specialization') }}</label>
+                        <select id="specialization" name="specialization">
+                            <option value="">{{ t('mechanic.list.filters.all', default='All') }}</option>
+                            {% for item in specializations %}
+                                <option value="{{ item }}" {% if filters.specialization == item %}selected{% endif %}>
+                                    {{ t('mechanic.specializations.' + item|lower, default=item) }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ t('mechanic.list.filters.availability') }}</label>
+                        <label class="availability-toggle" style="margin-top: 0;">
+                            <input type="checkbox" name="available_only" {% if filters.available_only %}checked{% endif %} onchange="this.form.submit()">
+                            {{ t('mechanic.list.filters.available_now') }}
+                        </label>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn-submit" style="width: 100%;">{{ t('mechanic.list.filters.submit') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            {% if mechanics %}
+            <div class="mechanics-grid">
+                {% for mechanic in mechanics %}
+                <div class="card mechanic-card">
+                    <div class="badge {% if mechanic['is_available'] %}available{% else %}unavailable{% endif %}">
+                        {% if mechanic['is_available'] %}
+                            {{ t('mechanic.list.card.available') }}
+                        {% else %}
+                            {{ t('mechanic.list.card.unavailable') }}
+                        {% endif %}
+                    </div>
+                    <h3>{{ mechanic['full_name'] }}</h3>
+                    <div class="mechanic-meta">
+                        <strong>{{ t('mechanic.specializations.' + mechanic['specialization']|lower, default=mechanic['specialization']) }}</strong>
+                        {% if mechanic['experience_years'] %}
+                        <span>{{ t('mechanic.list.card.experience', years=mechanic['experience_years']) }}</span>
+                        {% endif %}
+                        <span>{{ t('mechanic.list.card.service_area', areas=mechanic['service_locations']) }}</span>
+                        <span>{{ t('mechanic.list.card.base_visit', charge='{:,.0f}'.format(mechanic['base_charge'])) }}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="ghost-btn view-details-btn"
+                            data-name="{{ mechanic['full_name'] }}"
+                            data-specialization="{{ t('mechanic.specializations.' + mechanic['specialization']|lower, default=mechanic['specialization']) }}"
+                            data-location-display="{{ t('mechanic.list.card.service_area', areas=mechanic['service_locations']) }}"
+                            data-charge-display="{{ t('mechanic.list.card.base_visit', charge='{:,.0f}'.format(mechanic['base_charge'])) }}"
+                            data-experience-text="{{ mechanic['experience_years'] and t('mechanic.list.card.experience', years=mechanic['experience_years']) or t('mechanic.list.details.experience_missing') }}"
+                            data-description="{{ mechanic['description'] or t('mechanic.list.card.no_description', default='No bio shared yet.') }}">
+                            {{ t('mechanic.list.buttons.view_details') }}
+                        </button>
+                        <button class="solid-btn request-service-btn"
+                            data-mechanic-id="{{ mechanic['id'] }}"
+                            data-mechanic-name="{{ mechanic['full_name'] }}">
+                            {{ t('mechanic.list.buttons.request_service') }}
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>{{ t('mechanic.list.empty.title') }}</h3>
+                <p>{{ t('mechanic.list.empty.subtitle') }}</p>
+                <a href="{{ url_for('mechanic_register') }}">{{ t('mechanic.list.empty.cta') }}</a>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="modal" id="detailsModal"
+         data-label-specialization="{{ t('mechanic.list.details.specialization') }}"
+         data-label-experience="{{ t('mechanic.list.details.experience') }}"
+         data-label-experience-missing="{{ t('mechanic.list.details.experience_missing') }}"
+         data-label-charge="{{ t('mechanic.list.details.base_visit') }}"
+         data-label-locations="{{ t('mechanic.list.details.service_area') }}">
+        <div class="modal-card">
+            <button class="modal-close" data-close>&times;</button>
+            <h2 id="detailsName"></h2>
+            <p id="detailsSpecialization"></p>
+            <p id="detailsExperience"></p>
+            <p id="detailsCharge"></p>
+            <p id="detailsLocations"></p>
+            <p id="detailsDescription"></p>
+        </div>
+    </div>
+
+    <div class="modal" id="requestModal">
+        <div class="modal-card">
+            <button class="modal-close" data-close>&times;</button>
+            <h2>{{ t('mechanic.list.request.title') }}</h2>
+            <p id="requestMechanicName" style="font-weight: 600;"
+               data-label-template="{{ t('mechanic.list.request.mechanic_label', name='__NAME__') }}"></p>
+            <form id="requestForm"
+                  data-sending-text="{{ t('mechanic.list.request.sending') }}"
+                  data-error-text="{{ t('mechanic.list.request.error') }}">
+                <input type="hidden" id="requestMechanicId">
+                <div class="form-group">
+                    <label for="farmer_name">{{ t('mechanic.list.request.fields.farmer_name') }}</label>
+                    <input type="text" id="farmer_name" name="farmer_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="request_phone">{{ t('mechanic.list.request.fields.phone') }}</label>
+                    <input type="text" id="request_phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="request_location">{{ t('mechanic.list.request.fields.location') }}</label>
+                    <textarea id="request_location" name="location" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="issue_description">{{ t('mechanic.list.request.fields.issue') }}</label>
+                    <textarea id="issue_description" name="issue_description" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit" style="width: 100%;">{{ t('mechanic.list.request.submit') }}</button>
+                <p id="requestFeedback" style="margin-top: 0.75rem;"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/mechanics.js') }}"></script>
+</body>
+</html>
+

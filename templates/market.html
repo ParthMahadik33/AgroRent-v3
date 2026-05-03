@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale }}" class="market-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroRent | Market Overview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/market.css') }}">
+</head>
+<body class="market-page">
+    <nav class="market-navbar">
+        <div class="market-nav-container">
+            <div class="market-logo">🌾 AgroRent</div>
+            <ul class="market-nav-menu">
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#market">Market</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#business">Business</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="language-switcher" aria-label="{{ t('language.change') }}">
+                {% for code in supported_languages %}
+                <a href="{{ url_for('set_language', lang_code=code) }}"
+                   class="language-pill {% if current_locale == code %}active{% endif %}">
+                    {{ language_names[code] }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">AgroRent</h1>
+            <p class="hero-subtitle">India's First AI-Powered Rural Machinery Rental Platform</p>
+            <p class="hero-description">Empowering 86% of India's farmers with affordable access to modern agricultural machinery</p>
+            <button class="cta-button">Learn More</button>
+        </div>
+    </section>
+
+    <!-- Problem Statement -->
+    <section id="problem" class="section problem-section">
+        <div class="container">
+            <h2 class="section-title">The Problem</h2>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="icon">👨‍🌾</div>
+                    <h3>86% Small & Marginal Farmers</h3>
+                    <p>Cannot afford machinery costing ₹3-25 lakhs</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">🤝</div>
+                    <h3>Unorganized Ecosystem</h3>
+                    <p>Offline, prone to overcharging, dependent on middlemen</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">❓</div>
+                    <h3>Lack of Information</h3>
+                    <p>Farmers don't know what machine they need or fair pricing</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">📉</div>
+                    <h3>Limited Availability</h3>
+                    <p>Especially during peak farming seasons</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Market Size -->
+    <section id="market" class="section market-section">
+        <div class="container">
+            <h2 class="section-title">Market Opportunity</h2>
+            <div class="market-stats">
+                <div class="market-stat">
+                    <h3>TAM</h3>
+                    <p class="stat-value">₹20,000+ Cr</p>
+                    <p class="stat-label">Total Addressable Market</p>
+                </div>
+                <div class="market-stat">
+                    <h3>SAM</h3>
+                    <p class="stat-value">₹8,000-10,000 Cr</p>
+                    <p class="stat-label">Serviceable Available Market</p>
+                </div>
+                <div class="market-stat">
+                    <h3>SOM</h3>
+                    <p class="stat-value">₹30-50 Cr</p>
+                    <p class="stat-label">First 3 Years Target</p>
+                </div>
+            </div>
+            
+            <div class="market-visual">
+                <div class="market-bar tam-bar">
+                    <span class="bar-label">TAM (100%)</span>
+                </div>
+                <div class="market-bar sam-bar">
+                    <span class="bar-label">SAM (22%)</span>
+                </div>
+                <div class="market-bar som-bar">
+                    <span class="bar-label">SOM (1.5%)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Now -->
+    <section class="section why-now-section">
+        <div class="container">
+            <h2 class="section-title">Why Now?</h2>
+            <div class="timing-grid">
+                <div class="timing-card">
+                    <div class="timing-icon">📱</div>
+                    <h4>67% Smartphone Penetration</h4>
+                    <p>Rising every year in rural India</p>
+                </div>
+                <div class="timing-card">
+                    <div class="timing-icon">💰</div>
+                    <h4>UPI Revolution</h4>
+                    <p>Farmers trust digital payments</p>
+                </div>
+                <div class="timing-card">
+                    <div class="timing-icon">🏛️</div>
+                    <h4>Government Push</h4>
+                    <p>Schemes promoting mechanization</p>
+                </div>
+                <div class="timing-card">
+                    <div class="timing-icon">👥</div>
+                    <h4>Young Farmers</h4>
+                    <p>18-35 age group prefers apps</p>
+                </div>
+            </div>
+            
+            <div class="growth-chart">
+                <h3>Mechanization Adoption Growth</h3>
+                <div class="chart-container">
+                    <div class="chart-bar" data-year="2015" data-value="30"></div>
+                    <div class="chart-bar" data-year="2017" data-value="37"></div>
+                    <div class="chart-bar" data-year="2019" data-value="45"></div>
+                    <div class="chart-bar" data-year="2021" data-value="52"></div>
+                    <div class="chart-bar" data-year="2023" data-value="58"></div>
+                    <div class="chart-bar" data-year="2024" data-value="60"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Competition -->
+    <section class="section competition-section">
+        <div class="container">
+            <h2 class="section-title">Competitive Advantage</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>EM3</th>
+                            <th>Trringo</th>
+                            <th>Local Rental</th>
+                            <th class="agrorent-col">AgroRent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Transparency</td>
+                            <td><span class="score score-4">●●●●○</span></td>
+                            <td><span class="score score-4">●●●●○</span></td>
+                            <td><span class="score score-2">●●○○○</span></td>
+                            <td class="agrorent-col"><span class="score score-5">●●●●●</span></td>
+                        </tr>
+                        <tr>
+                            <td>AI Tools</td>
+                            <td><span class="score score-2">●●○○○</span></td>
+                            <td><span class="score score-1">●○○○○</span></td>
+                            <td><span class="score score-0">○○○○○</span></td>
+                            <td class="agrorent-col"><span class="score score-5">●●●●●</span></td>
+                        </tr>
+                        <tr>
+                            <td>Damage/Fraud Check</td>
+                            <td><span class="score score-1">●○○○○</span></td>
+                            <td><span class="score score-0">○○○○○</span></td>
+                            <td><span class="score score-0">○○○○○</span></td>
+                            <td class="agrorent-col"><span class="score score-5">●●●●●</span></td>
+                        </tr>
+                        <tr>
+                            <td>Affordability</td>
+                            <td><span class="score score-2">●●○○○</span></td>
+                            <td><span class="score score-2">●●○○○</span></td>
+                            <td><span class="score score-3">●●●○○</span></td>
+                            <td class="agrorent-col"><span class="score score-5">●●●●●</span></td>
+                        </tr>
+                        <tr>
+                            <td>Rural Coverage</td>
+                            <td><span class="score score-3">●●●○○</span></td>
+                            <td><span class="score score-4">●●●●○</span></td>
+                            <td><span class="score score-5">●●●●●</span></td>
+                            <td class="agrorent-col"><span class="score score-5">●●●●●</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution/UVP -->
+    <section id="solution" class="section solution-section">
+        <div class="container">
+            <h2 class="section-title">Our Solution</h2>
+            <p class="section-subtitle">India's First AI-Supported Rural Machinery Rental Ecosystem</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Machinery Recommendation</h3>
+                    <p>Smart suggestions based on crop, land size, and soil type</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>AI Damage Detection</h3>
+                    <p>Before/after photo analysis for transparency</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💵</div>
+                    <h3>Smart Cost Predictor</h3>
+                    <p>Fair rental pricing based on multiple factors</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3>Verified Owners</h3>
+                    <p>Trusted machinery owners with ratings</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🗣️</div>
+                    <h3>Multi-Language Support</h3>
+                    <p>Hindi, Marathi, and regional languages</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Route Optimization</h3>
+                    <p>Efficient machinery movement planning</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Personas -->
+    <section class="section personas-section">
+        <div class="container">
+            <h2 class="section-title">Who We Serve</h2>
+            <div class="personas-grid">
+                <div class="persona-card">
+                    <div class="persona-avatar">👨‍🌾</div>
+                    <h3>Ravi - Farmer</h3>
+                    <ul>
+                        <li>Owns 2-3 acres</li>
+                        <li>Cannot afford machinery</li>
+                        <li>Needs simple WhatsApp-like UI</li>
+                        <li>Wants machine quality guarantee</li>
+                    </ul>
+                </div>
+                <div class="persona-card">
+                    <div class="persona-avatar">👨‍🔧</div>
+                    <h3>Suresh - Machine Owner</h3>
+                    <ul>
+                        <li>Owns tractor & rotavator</li>
+                        <li>Wants steady rental income</li>
+                        <li>Needs visibility beyond village</li>
+                        <li>Requires damage protection</li>
+                    </ul>
+                </div>
+                <div class="persona-card">
+                    <div class="persona-avatar">👨‍💻</div>
+                    <h3>Aditya - Young Entrepreneur</h3>
+                    <ul>
+                        <li>Tech-aware</li>
+                        <li>Manages family farm operations</li>
+                        <li>Prefers digital solutions</li>
+                        <li>Early adopter mindset</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Model -->
+    <section id="business" class="section business-section">
+        <div class="container">
+            <h2 class="section-title">Business Model</h2>
+            <div class="business-grid">
+                <div class="business-card">
+                    <h3>💰 Revenue Streams</h3>
+                    <ul>
+                        <li><strong>5-10% Commission</strong> on each rental</li>
+                        <li><strong>Subscription Plans</strong> for machine owners</li>
+                        <li><strong>AI Tools</strong> as paid add-ons</li>
+                        <li><strong>Partnerships</strong> with equipment dealers & banks</li>
+                    </ul>
+                </div>
+                <div class="business-card">
+                    <h3>📊 Cost Structure</h3>
+                    <ul>
+                        <li>Server & storage infrastructure</li>
+                        <li>Field onboarding teams</li>
+                        <li>Rural cluster marketing</li>
+                        <li>Customer support operations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Traction -->
+    <section class="section traction-section">
+        <div class="container">
+            <h2 class="section-title">Market Validation</h2>
+            <div class="traction-stats">
+                <div class="traction-stat">
+                    <div class="stat-number">80%</div>
+                    <p>Small farmers rent machinery 2+ times/year</p>
+                </div>
+                <div class="traction-stat">
+                    <div class="stat-number">60-65%</div>
+                    <p>Face pricing or availability issues</p>
+                </div>
+                <div class="traction-stat">
+                    <div class="stat-number">30-40%</div>
+                    <p>Machinery idle time for owners</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section class="section roadmap-section">
+        <div class="container">
+            <h2 class="section-title">Growth Roadmap</h2>
+            <div class="roadmap-timeline">
+                <div class="roadmap-item">
+                    <div class="roadmap-marker">1</div>
+                    <h3>6-12 Months</h3>
+                    <ul>
+                        <li>Launch in 2-3 districts</li>
+                        <li>Onboard 100+ machinery owners</li>
+                        <li>Build repeat user base</li>
+                    </ul>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-marker">2</div>
+                    <h3>2-3 Years</h3>
+                    <ul>
+                        <li>Expand statewide</li>
+                        <li>Integrate AI crop advisory</li>
+                        <li>Add insurance & finance partners</li>
+                    </ul>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-marker">3</div>
+                    <h3>5 Years</h3>
+                    <ul>
+                        <li>India's default rural marketplace</li>
+                        <li>Expand to seeds & fertilizers</li>
+                        <li>Build nationwide agri-data ecosystem</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section id="contact" class="section cta-section">
+        <div class="container">
+            <h2>Ready to Transform Rural India?</h2>
+            <p>Join us in empowering millions of farmers with affordable access to modern machinery</p>
+            <button class="cta-button-large">Get in Touch</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="market-footer">
+        <div class="container">
+            <p>&copy; 2024 AgroRent. Empowering India's farmers through technology.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/market.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('nav.brand') }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('index') }}">
+                    <span class="logo-icon">🌾</span>
+                    {{ t('nav.brand') }}
+                </a>
+            </div>
+            <div class="nav-right">
+                <div class="language-dropdown profile-dropdown">
+                    <button class="profile-btn" id="language-btn">
+                        <i class="fas fa-globe"></i>
+                        <span>{{ language_names[current_locale] }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="language-menu">
+                        {% for code in supported_languages %}
+                        <a href="{{ url_for('set_language', lang_code=code) }}"
+                            class="dropdown-item {% if current_locale == code %}active{% endif %}">
+                            {{ language_names[code] }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if session.user_id %}
+                <div class="nav-shortcuts">
+                    <a href="{{ url_for('market') }}" class="nav-btn about-btn">{{ t('nav.market') }}</a>
+                    <a href="{{ url_for('heatmap') }}" class="nav-btn about-btn">{{ t('nav.heatmap') }}</a>
+
+                    <div class="mechanic-dropdown profile-dropdown">
+                        <button class="profile-btn" id="mechanic-btn">
+                            <i class="fas fa-tools"></i>
+                            <span>{{ t('nav.mechanics_menu') }}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="mechanic-menu">
+                            <a href="{{ url_for('mechanics_list') }}" class="dropdown-item">
+                                <i class="fas fa-search"></i>
+                                <span>{{ t('nav.find_mechanic') }}</span>
+                            </a>
+                            <a href="{{ url_for('mechanic_register') }}" class="dropdown-item">
+                                <i class="fas fa-user-plus"></i>
+                                <span>{{ t('nav.register_mechanic') }}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Notifications -->
+                <div class="notification-dropdown">
+                    <button class="notification-btn" id="notification-btn" onclick="toggleNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                    </button>
+                    <div class="notification-menu" id="notification-menu">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button class="mark-all-read-btn" onclick="markAllNotificationsRead()"
+                                id="mark-all-read-btn" style="display: none;">Mark all as read</button>
+                        </div>
+                        <div class="notification-list" id="notification-list">
+                            <div class="notification-loading">Loading notifications...</div>
+                        </div>
+                        <div class="notification-empty" id="notification-empty" style="display: none;">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>No notifications</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Profile Dropdown for logged in users -->
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profile-btn">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="username">{{ session.user_name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="{{ url_for('rentdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-tractor"></i>
+                            <span>{{ t('nav.rent_dashboard') }}</span>
+                        </a>
+                        <a href="{{ url_for('listdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-list"></i>
+                            <span>{{ t('nav.list_dashboard') }}</span>
+                        </a>
+                        <a href="{{ url_for('mechanic_dashboard') }}" class="dropdown-item">
+                            <i class="fas fa-tools"></i>
+                            <span>{{ t('nav.mechanic_dashboard') }}</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('signout') }}" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>{{ t('nav.logout') }}</span>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Auth buttons for non-logged in users -->
+                <div class="auth-buttons">
+                    <a href="{{ url_for('market') }}" class="nav-btn about-btn">{{ t('nav.market') }}</a>
+                    <a href="{{ url_for('heatmap') }}" class="nav-btn about-btn">{{ t('nav.heatmap') }}</a>
+                    <a href="{{ url_for('signin') }}" class="nav-btn login-btn">{{ t('nav.sign_in') }}</a>
+                    <a href="{{ url_for('signup') }}" class="nav-btn signup-btn">{{ t('nav.sign_up') }}</a>
+                    <a href="{{ url_for('about') }}" class="nav-btn about-btn">{{ t('nav.about') }}</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="video-background">
+            <!-- Placeholder video - in production, replace with actual video URL -->
+            <video autoplay muted loop>
+                <source
+                    src="https://res.cloudinary.com/dbpo7d6dx/video/upload/v1763563059/Hero_page_video_1_1_1_jpqjtn.mp4"
+                    type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="video-overlay"></div>
+
+        <div class="hero-content">
+            <img src="/assets/hero text.png" alt="AgroRent Logo" class="logo">
+            <p class="hero-tagline">{{ t('home.hero.tagline') }}</p>
+            <p class="hero-subtext">{{ t('home.hero.subtext') }}</p>
+            <div class="cta-buttons">
+                {% if session.user_id %}
+                <a href="{{ url_for('listing') }}" class="cta-button cta-primary">{{ t('home.hero.cta_primary') }}</a>
+                <a href="{{ url_for('renting') }}" class="cta-button cta-secondary">{{ t('home.hero.cta_renting') }}</a>
+                {% else %}
+                <a href="{{ url_for('signup') }}" class="cta-button cta-secondary">{{ t('home.hero.cta_secondary')
+                    }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% if session.user_id %}
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+
+</html>

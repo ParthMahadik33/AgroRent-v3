@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - AgroRent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup-modern.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    
+<!-- Navigation Bar -->
+<nav class="navbar auth-navbar">
+    <div class="nav-container">
+        <div class="nav-logo">
+            <a href="{{ url_for('index') }}">
+                <span class="logo-icon">🌾</span>
+                AgroRent
+            </a>
+        </div>
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="{{ url_for('signin') }}" class="nav-btn">Sign In</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Sign Up Section -->
+<section class="auth-section-modern">
+    <div class="auth-container-modern">
+        <!-- Left Column: Carousel -->
+        <div class="auth-carousel-column">
+            <div class="carousel-container">
+                <div class="carousel-slides" id="carousel-slides">
+                    <!-- Slide 1 -->
+                    <div class="carousel-slide active">
+                        <div class="carousel-image" style="background-image: url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+                        <div class="carousel-overlay"></div>
+                        <div class="carousel-review">
+                            <div class="review-content">
+                                <div class="review-stars">★★★★★</div>
+                                <p class="review-text">"Found a tractor in minutes instead of calling five neighbors. Good site"</p>
+                                <p class="review-author">— Farmer Review</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="carousel-slide">
+                        <div class="carousel-image" style="background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+                        <div class="carousel-overlay"></div>
+                        <div class="carousel-review">
+                            <div class="review-content">
+                                <div class="review-stars">★★★★★</div>
+                                <p class="review-text">"Reliable platform—got what I needed without any back-and-forth calls."</p>
+                                <p class="review-author">— Farmer Review</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="carousel-slide">
+                        <div class="carousel-image" style="background-image: url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+                        <div class="carousel-overlay"></div>
+                        <div class="carousel-review">
+                            <div class="review-content">
+                                <div class="review-stars">★★★★★</div>
+                                <p class="review-text">"किरकोळ कामांपासून मोठ्या कामांसाठीही इथे मशीन मिळतं—सोयीचं प्लॅटफॉर्म।"</p>
+                                <p class="review-author">— Farmer Review</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 4 -->
+                    <div class="carousel-slide">
+                        <div class="carousel-image" style="background-image: url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+                        <div class="carousel-overlay"></div>
+                        <div class="carousel-review">
+                            <div class="review-content">
+                                <div class="review-stars">★★★★★</div>
+                                <p class="review-text">"साइट वापरायला साधी आणि सरळ दोन मिनिटांत ट्रॅक्टर बुक झालं।"</p>
+                                <p class="review-author">— Farmer Review</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 5 -->
+                    <div class="carousel-slide">
+                        <div class="carousel-image" style="background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+                        <div class="carousel-overlay"></div>
+                        <div class="carousel-review">
+                            <div class="review-content">
+                                <div class="review-stars">★★★★★</div>
+                                <p class="review-text">"गावात असं सोपं पर्याय मिळणं म्हणजे मोठी सोय; वेळ पण वाचतो आणि कामही।"</p>
+                                <p class="review-author">— Farmer Review</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Navigation Arrows -->
+                <button class="carousel-nav carousel-prev" id="carousel-prev" aria-label="Previous slide">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-nav carousel-next" id="carousel-next" aria-label="Next slide">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <!-- Indicators -->
+                <div class="carousel-indicators" id="carousel-indicators"></div>
+            </div>
+        </div>
+
+        <!-- Right Column: Signup Form -->
+        <div class="auth-form-column">
+            <div class="auth-card-modern">
+                <div class="auth-header-modern">
+                    <h1 class="auth-title-modern">Create your account</h1>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-container">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    <span>{{ message }}</span>
+                                    <button class="close-alert" onclick="this.parentElement.remove()">&times;</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form class="auth-form-modern" id="signup-form" method="POST" action="{{ url_for('signup') }}">
+                    <div class="form-group-modern">
+                        <div class="floating-label-wrapper">
+                            <input type="text" id="fullname" name="fullname" class="form-input-modern" placeholder=" " required>
+                            <label for="fullname" class="floating-label">Full Name</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <div class="floating-label-wrapper">
+                            <input type="email" id="email" name="email" class="form-input-modern" placeholder=" " required>
+                            <label for="email" class="floating-label">Email</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <div class="floating-label-wrapper">
+                            <input type="tel" id="phone" name="phone" class="form-input-modern" placeholder=" " required>
+                            <label for="phone" class="floating-label">Phone</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <div class="floating-label-wrapper">
+                            <input type="password" id="password" name="password" class="form-input-modern" placeholder=" " required>
+                            <label for="password" class="floating-label">Password</label>
+                            <button type="button" class="password-toggle-modern" id="password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="checkbox-label-modern">
+                            <input type="checkbox" name="terms" required>
+                            <span>I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn-modern">
+                        Create Account
+                    </button>
+
+                    <div class="auth-footer-modern">
+                        <p>Already have an account? <a href="{{ url_for('signin') }}" class="auth-link-modern">Sign in</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Carousel functionality
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const totalSlides = slides.length;
+    let carouselInterval;
+
+    function updateCarousel() {
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            if (index === currentSlide) {
+                slide.classList.add('active');
+            }
+        });
+
+        // Update indicators
+        const indicators = document.querySelectorAll('.carousel-indicator');
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === currentSlide);
+        });
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateCarousel();
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        updateCarousel();
+    }
+
+    function startCarousel() {
+        carouselInterval = setInterval(nextSlide, 5000);
+    }
+
+    function stopCarousel() {
+        clearInterval(carouselInterval);
+    }
+
+    // Initialize carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create indicators
+        const indicatorsContainer = document.getElementById('carousel-indicators');
+        if (indicatorsContainer && totalSlides > 0) {
+            for (let i = 0; i < totalSlides; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = 'carousel-indicator' + (i === 0 ? ' active' : '');
+                indicator.addEventListener('click', () => {
+                    currentSlide = i;
+                    updateCarousel();
+                    stopCarousel();
+                    startCarousel();
+                });
+                indicatorsContainer.appendChild(indicator);
+            }
+
+            // Navigation buttons
+            const nextBtn = document.getElementById('carousel-next');
+            const prevBtn = document.getElementById('carousel-prev');
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    nextSlide();
+                    stopCarousel();
+                    startCarousel();
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    prevSlide();
+                    stopCarousel();
+                    startCarousel();
+                });
+            }
+
+            // Pause on hover
+            const carouselContainer = document.querySelector('.carousel-container');
+            if (carouselContainer) {
+                carouselContainer.addEventListener('mouseenter', stopCarousel);
+                carouselContainer.addEventListener('mouseleave', startCarousel);
+            }
+
+            // Start auto-rotation
+            startCarousel();
+        }
+
+        // Floating labels functionality
+        document.querySelectorAll('.form-input-modern').forEach(input => {
+            // Check if input has value on load
+            if (input.value) {
+                input.classList.add('has-value');
+            }
+
+            input.addEventListener('focus', function() {
+                this.classList.add('focused');
+            });
+
+            input.addEventListener('blur', function() {
+                this.classList.remove('focused');
+                if (this.value) {
+                    this.classList.add('has-value');
+                } else {
+                    this.classList.remove('has-value');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.value) {
+                    this.classList.add('has-value');
+                } else {
+                    this.classList.remove('has-value');
+                }
+            });
+        });
+
+        // Password toggle functionality
+        const passwordToggle = document.getElementById('password-toggle');
+        if (passwordToggle) {
+            passwordToggle.addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const icon = this.querySelector('i');
+                
+                if (passwordInput && icon) {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                }
+            });
+        }
+
+        // Form validation (client-side)
+        const signupForm = document.getElementById('signup-form');
+        if (signupForm) {
+            signupForm.addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+                
+                if (password && password.length < 6) {
+                    e.preventDefault();
+                    alert('Password must be at least 6 characters long!');
+                    return false;
+                }
+                
+                // Form will submit normally to Flask
+            });
+        }
+    });
+</script>
+</body>
+</html>

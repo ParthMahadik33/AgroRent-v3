@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('mechanic.register.title') }} | {{ t('nav.brand') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mechanics.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="simple-nav">
+            <div class="nav-container">
+                <div class="nav-left">
+                    <a href="{{ url_for('index') }}">🌾 {{ t('nav.brand') }}</a>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-switcher" aria-label="{{ t('language.change') }}">
+                        {% for code in supported_languages %}
+                        <a href="{{ url_for('set_language', lang_code=code) }}"
+                           class="language-pill {% if current_locale == code %}active{% endif %}">
+                            {{ language_names[code] }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <a class="nav-link-btn secondary" href="{{ url_for('mechanics_list') }}">{{ t('nav.find_mechanic') }}</a>
+                    {% if session.user_id %}
+                    <a class="nav-link-btn secondary" href="{{ url_for('mechanic_dashboard') }}">{{ t('nav.mechanic_dashboard') }}</a>
+                    <a class="nav-link-btn primary" href="{{ url_for('signout') }}">{{ t('nav.logout') }}</a>
+                    {% else %}
+                    <a class="nav-link-btn secondary" href="{{ url_for('signin') }}">{{ t('nav.sign_in') }}</a>
+                    <a class="nav-link-btn primary" href="{{ url_for('signup') }}">{{ t('nav.sign_up') }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <section class="content-section">
+            <div class="page-header">
+                <h1>{{ t('mechanic.register.title') }}</h1>
+                <p>{{ t('mechanic.register.subtitle') }}</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    <div class="flash-container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="card">
+                <form method="POST" class="mechanic-form">
+                    <div class="form-group">
+                        <label for="full_name">{{ t('mechanic.register.fields.full_name') }}</label>
+                        <input type="text" id="full_name" name="full_name" placeholder="{{ t('mechanic.register.placeholders.full_name') }}" value="{{ form_data.full_name or '' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">{{ t('mechanic.register.fields.phone') }}</label>
+                        <input type="text" id="phone" name="phone" placeholder="{{ t('mechanic.register.placeholders.phone') }}" value="{{ form_data.phone or '' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">{{ t('mechanic.register.fields.email') }}</label>
+                        <input type="email" id="email" name="email" placeholder="{{ t('mechanic.register.placeholders.email') }}" value="{{ form_data.email or '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience_years">{{ t('mechanic.register.fields.experience') }}</label>
+                        <input type="number" id="experience_years" name="experience_years" min="0" placeholder="{{ t('mechanic.register.placeholders.experience') }}" value="{{ form_data.experience_years or '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialization">{{ t('mechanic.register.fields.specialization') }}</label>
+                        <select id="specialization" name="specialization" required>
+                            <option value="">{{ t('mechanic.register.placeholders.specialization_option') }}</option>
+                            {% for item in specializations %}
+                                <option value="{{ item }}" {% if form_data.specialization == item %}selected{% endif %}>
+                                    {{ t('mechanic.specializations.' + item|lower, default=item) }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service_locations">{{ t('mechanic.register.fields.locations') }}</label>
+                        <textarea id="service_locations" name="service_locations" placeholder="{{ t('mechanic.register.placeholders.locations') }}" required>{{ form_data.service_locations or '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="base_charge">{{ t('mechanic.register.fields.base_charge') }}</label>
+                        <input type="number" id="base_charge" name="base_charge" min="0" step="100" placeholder="{{ t('mechanic.register.placeholders.base_charge') }}" value="{{ form_data.base_charge or '' }}" required>
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="description">{{ t('mechanic.register.fields.description') }}</label>
+                        <textarea id="description" name="description" placeholder="{{ t('mechanic.register.placeholders.description') }}">{{ form_data.description or '' }}</textarea>
+                        <label class="availability-toggle">
+                            <input type="checkbox" name="is_available" {% if form_data.is_available is defined %}{{ form_data.is_available }}{% else %}checked{% endif %}>
+                            {{ t('mechanic.register.toggle') }}
+                        </label>
+                    </div>
+
+                    <div style="grid-column: 1 / -1;">
+                        <button type="submit" class="btn-submit">{{ t('mechanic.register.submit') }}</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
+

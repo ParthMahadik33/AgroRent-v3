@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('mechanic.dashboard.title') }} | {{ t('nav.brand') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mechanics.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="simple-nav">
+            <div class="nav-container">
+                <div class="nav-left">
+                    <a href="{{ url_for('index') }}">🌾 {{ t('nav.brand') }}</a>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-switcher" aria-label="{{ t('language.change') }}">
+                        {% for code in supported_languages %}
+                        <a href="{{ url_for('set_language', lang_code=code) }}"
+                           class="language-pill {% if current_locale == code %}active{% endif %}">
+                            {{ language_names[code] }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <a class="nav-link-btn secondary" href="{{ url_for('mechanics_list') }}">{{ t('nav.find_mechanic') }}</a>
+                    <a class="nav-link-btn secondary" href="{{ url_for('mechanic_register') }}">{{ t('nav.edit_profile') }}</a>
+                    <a class="nav-link-btn primary" href="{{ url_for('signout') }}">{{ t('nav.logout') }}</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="content-section">
+            <div class="page-header">
+                <h1>{{ t('mechanic.dashboard.title') }}</h1>
+                <p>{{ t('mechanic.dashboard.subtitle') }}</p>
+            </div>
+
+            {% if mechanic %}
+            <div class="card">
+                <div class="dash-toggle">
+                    <label class="availability-toggle" style="margin-top: 0;">
+                        <input type="checkbox" id="availabilityToggle" {% if mechanic['is_available'] %}checked{% endif %}>
+                        {{ t('mechanic.dashboard.toggle_label') }}
+                    </label>
+                    <span id="availabilityStatus"
+                          data-visible-label="{{ t('mechanic.dashboard.visible') }}"
+                          data-hidden-label="{{ t('mechanic.dashboard.hidden') }}"
+                          data-updating-label="{{ t('mechanic.dashboard.availability_updating') }}"
+                          data-error-label="{{ t('mechanic.dashboard.availability_error') }}">
+                        {% if mechanic['is_available'] %}{{ t('mechanic.dashboard.visible') }}{% else %}{{ t('mechanic.dashboard.hidden') }}{% endif %}
+                    </span>
+                </div>
+                {% set experience_suffix = '' %}
+                {% if mechanic['experience_years'] %}
+                    {% set experience_suffix = t('mechanic.dashboard.experience_suffix', years=mechanic['experience_years']) %}
+                {% endif %}
+                {% set specialization_label = t('mechanic.specializations.' + mechanic['specialization']|lower, default=mechanic['specialization']) %}
+                <div>
+                    <strong>{{ mechanic['full_name'] }}</strong>{{ t('mechanic.dashboard.summary_suffix', specialization=specialization_label, experience=experience_suffix)|trim }}
+                </div>
+                <p style="margin: 0.5rem 0 0;">{{ t('mechanic.dashboard.service_area', areas=mechanic['service_locations']) }}</p>
+                <p style="margin: 0.25rem 0 0;">{{ t('mechanic.dashboard.base_rate', charge='{:,.0f}'.format(mechanic['base_charge'])) }}</p>
+            </div>
+
+            <div class="requests-list"
+                 data-accept-label="{{ t('mechanic.dashboard.request.accept') }}"
+                 data-complete-label="{{ t('mechanic.dashboard.request.complete') }}"
+                 data-retry-label="{{ t('mechanic.dashboard.request.retry', status='__STATUS__') }}">
+                {% if service_requests %}
+                    {% for req in service_requests %}
+                    <div class="request-card" data-request-id="{{ req['id'] }}">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+                            <div>
+                                <h4>{{ req['farmer_name'] }}</h4>
+                                <div class="request-meta">{{ t('mechanic.dashboard.request.phone', phone=req['phone']) }}</div>
+                                <div class="request-meta">{{ t('mechanic.dashboard.request.location', location=req['location']) }}</div>
+                            </div>
+                            <span class="status-pill {{ req['status'] }}">{{ t('mechanic.requests.status_labels.' + req['status']|lower, default=req['status']) }}</span>
+                        </div>
+                        <p style="margin-top:0.5rem;">{{ t('mechanic.dashboard.request.issue', issue=req['issue_description']) }}</p>
+                        <div class="request-actions">
+                            {% if req['status'] != 'Accepted' %}
+                            <button class="ghost-btn request-status-btn" data-status="Accepted">{{ t('mechanic.dashboard.request.accept') }}</button>
+                            {% endif %}
+                            {% if req['status'] != 'Completed' %}
+                            <button class="solid-btn request-status-btn" data-status="Completed">{{ t('mechanic.dashboard.request.complete') }}</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <h3>{{ t('mechanic.dashboard.no_requests_title') }}</h3>
+                        <p>{{ t('mechanic.dashboard.no_requests_body') }}</p>
+                        <a href="{{ url_for('mechanics_list') }}">{{ t('mechanic.dashboard.list_cta') }}</a>
+                    </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>{{ t('mechanic.dashboard.no_profile_title') }}</h3>
+                <p>{{ t('mechanic.dashboard.no_profile_body') }}</p>
+                <a href="{{ url_for('mechanic_register') }}">{{ t('mechanic.dashboard.no_profile_cta') }}</a>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <script>
+        window.mechanicDashboard = {
+            hasProfile: {{ (mechanic is not none)|tojson }},
+            availabilityEndpoint: {{ url_for('update_mechanic_availability')|tojson }},
+            requestEndpointTemplate: {{ url_for('update_mechanic_request_status', request_id=0)|tojson }},
+            statusLabels: {{ {
+                'Pending': t('mechanic.requests.status_labels.pending'),
+                'Accepted': t('mechanic.requests.status_labels.accepted'),
+                'Completed': t('mechanic.requests.status_labels.completed')
+            }|tojson }}
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/mechanics.js') }}"></script>
+</body>
+</html>
+

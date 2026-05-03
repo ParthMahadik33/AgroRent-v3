@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Listings - AgroRent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/listdashboard.css') }}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('index') }}">
+                    <span class="logo-icon">🌾</span>
+                    AgroRent
+                </a>
+            </div>
+            <div class="nav-right">
+                {% if session.user_id %}
+                <!-- Notifications -->
+                <div class="notification-dropdown">
+                    <button class="notification-btn" id="notification-btn" onclick="toggleNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                    </button>
+                    <div class="notification-menu" id="notification-menu">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button class="mark-all-read-btn" onclick="markAllNotificationsRead()" id="mark-all-read-btn" style="display: none;">Mark all as read</button>
+                        </div>
+                        <div class="notification-list" id="notification-list">
+                            <div class="notification-loading">Loading notifications...</div>
+                        </div>
+                        <div class="notification-empty" id="notification-empty" style="display: none;">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>No notifications</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profile-btn">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="username">{{ session.user_name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="{{ url_for('rentdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-tractor"></i>
+                            <span>Renting Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('listdashboard') }}" class="dropdown-item">
+                            <i class="fas fa-list"></i>
+                            <span>Listing Dashboard</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('signout') }}" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="auth-buttons">
+                    <a href="{{ url_for('signin') }}" class="nav-btn login-btn">Sign In</a>
+                    <a href="{{ url_for('signup') }}" class="nav-btn signup-btn">Sign Up</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <h1><i class="fas fa-list"></i> My Listings</h1>
+                <p>Manage your equipment listings</p>
+            </div>
+            <a href="{{ url_for('listing') }}" class="btn-add-listing">
+                <i class="fas fa-plus"></i> Add New Listing
+            </a>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading your listings...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <i class="fas fa-inbox"></i>
+            <h3>No listings yet</h3>
+            <p>Start by adding your first equipment listing</p>
+            <a href="{{ url_for('listing') }}" class="btn-add-listing">
+                <i class="fas fa-plus"></i> Create Your First Listing
+            </a>
+        </div>
+
+        <!-- Listings Grid -->
+        <div class="listings-grid" id="listings-grid">
+            <!-- Cards will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="delete-modal" id="delete-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2>Delete Listing?</h2>
+            <p>Are you sure you want to delete this listing? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancel-delete">Cancel</button>
+                <button class="btn-delete" id="confirm-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% if session.user_id %}
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/listdashboard.js') }}"></script>
+</body>
+</html>
+
+
