@@ -1,6 +1,6 @@
 from flask import jsonify, request
-from google import genai
-from config import GEMINI_API_KEY
+import groq
+from config import GROQ_API_KEY
 
 _client = None
 
@@ -8,9 +8,9 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        if not GEMINI_API_KEY:
-            raise RuntimeError("GEMINI_API_KEY is missing. Check your .env file.")
-        _client = genai.Client(api_key=GEMINI_API_KEY)
+        if not GROQ_API_KEY:
+            raise RuntimeError("GROQ_API_KEY is missing. Check your .env file.")
+        _client = groq.Groq(api_key=GROQ_API_KEY)
     return _client
 
 PLATFORM_DATA = """
@@ -81,17 +81,19 @@ def chat():
         if not user_message:
             return jsonify({'error': 'No message provided'}), 400
         
-        # Combine system prompt with user message
-        full_prompt = f"{AGRORENT_SYSTEM_PROMPT}\n\nUser: {user_message}\nAssistant:"
-        
-        # Generate response using Gemini
-        response = _get_client().models.generate_content(
-            model="gemini-2.5-flash",
-            contents=full_prompt
+        # Generate response using Groq
+        response = _get_client().chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": AGRORENT_SYSTEM_PROMPT},
+                {"role": "user", "content": user_message}
+            ],
+            max_tokens=500,
+            temperature=0.3
         )
         
         # Extract the response text
-        bot_response = response.text if hasattr(response, 'text') else str(response)
+        bot_response = response.choices[0].message.content
         
         return jsonify({
             'response': bot_response,

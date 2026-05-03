@@ -10,6 +10,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = os.path.join(BASE_DIR, "agrorent.db")
 SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", os.urandom(24))
 GEMINI_API_KEY = (os.environ.get("GEMINI_API_KEY") or "").strip() or None
+GROQ_API_KEY = (os.environ.get("GROQ_API_KEY") or "").strip() or None
 RAZORPAY_KEY_ID = (os.environ.get("RAZORPAY_KEY_ID") or "").strip() or None
 RAZORPAY_KEY_SECRET = (os.environ.get("RAZORPAY_KEY_SECRET") or "").strip() or None
 TWILIO_ACCOUNT_SID = (os.environ.get("TWILIO_ACCOUNT_SID") or "").strip() or None

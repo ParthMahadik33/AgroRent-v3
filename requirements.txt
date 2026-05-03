@@ -4,6 +4,7 @@ Flask-Babel==4.0.0
 reportlab==4.0.7
 flask-cors==4.0.0
 google-genai==0.2.2
+groq
 python-dotenv==1.0.0
 twilio==9.3.0
 redis==5.0.0

@@ -1,6 +1,6 @@
 import json
-from google import genai
-from config import GEMINI_API_KEY
+import groq
+from config import GROQ_API_KEY
 
 _client = None
 
@@ -8,15 +8,10 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        if not GEMINI_API_KEY:
-            raise RuntimeError("GEMINI_API_KEY is missing. Check your .env file.")
-        _client = genai.Client(api_key=GEMINI_API_KEY)
+        if not GROQ_API_KEY:
+            raise RuntimeError("GROQ_API_KEY is missing. Check your .env file.")
+        _client = groq.Groq(api_key=GROQ_API_KEY)
     return _client
-
-
-def _response_text(response):
-    """Match ai/chatbot.py response extraction."""
-    return response.text if hasattr(response, 'text') else str(response)
 
 
 SYSTEM_PROMPT = """
@@ -55,13 +50,17 @@ CROP_TO_EQUIPMENT = {
 
 
 def extract_intent(message: str) -> dict:
-    """Send message to Gemini and get structured intent back"""
+    """Send message to Groq and get structured intent back"""
     try:
-        response = _get_client().models.generate_content(
-            model="gemini-2.5-flash",
-            contents=f"{SYSTEM_PROMPT}\n\nFarmer message: {message}",
+        response = _get_client().chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": f"Farmer message: {message}"}
+            ],
+            temperature=0.0  # Keep extraction deterministic
         )
-        raw = _response_text(response).strip()
+        raw = response.choices[0].message.content.strip()
         # Strip markdown fences if present
         if '```' in raw:
             raw = raw.split('```')[1]
@@ -85,16 +84,22 @@ def translate_to_language(text: str, language: str) -> str:
     if language in ('en', 'english', None):
         return text
     try:
-        response = _get_client().models.generate_content(
-            model="gemini-2.5-flash",
-            contents=(
-                f"Translate this WhatsApp message to language code '{language}'. "
-                "Keep emojis, numbers, phone numbers, and *bold* formatting. "
-                "Return ONLY the translated text, nothing else:\n\n"
-                f"{text}"
-            ),
+        response = _get_client().chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        f"Translate this WhatsApp message to language code '{language}'. "
+                        "Keep emojis, numbers, phone numbers, and *bold* formatting. "
+                        "Return ONLY the translated text, nothing else."
+                    )
+                },
+                {"role": "user", "content": text}
+            ],
+            temperature=0.3
         )
-        return _response_text(response).strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"Translation error: {e}")
         return text

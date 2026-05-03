@@ -13,6 +13,7 @@ def whatsapp_webhook():
     print(f"📱 Message from {from_number}: {body}")
 
     reply = handle_whatsapp_message(from_number, body, media_url)
+    print(f"🤖 Bot reply: {reply}")
 
     resp = MessagingResponse()
     resp.message(reply)
