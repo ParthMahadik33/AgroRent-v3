@@ -1,3 +1,4 @@
+import setuptools
 from flask import Flask
 from flask_babel import Babel
 from flask_cors import CORS
